@@ -1,19 +1,8 @@
 import matplotlib.pyplot as plt
 from model import SimpleModel
-from functions import (
-    fecundity,
-    juvenile_survival_probability,
-    adult_survival_probability,
-    strength_cannibalism,
-)
+from functions import model
 
 # Create a new instance of the model
-model = SimpleModel(
-    fecundity,
-    juvenile_survival_probability,
-    adult_survival_probability,
-    strength_cannibalism,
-)
 
 # Run the model for 20 time steps starting with 10 juveniles and 20 adults
 juveniles, adults = model.run(SimpleModel.State(100, 100), 20)

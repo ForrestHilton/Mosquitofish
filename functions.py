@@ -4,6 +4,7 @@ included in all of the possible models. This makes it easier to make variants
 of models because we can just import this file and call each of the functions
 in the models when we need them rather than having to redefine them each time
 """
+from model import SimpleModel
 
 # Simple model functions/parameters
 
@@ -38,3 +39,9 @@ fecundity = (avg_births_at_once*broods_per_lifetime*time_step_weeks)/avg_lifespa
 
 strength_cannibalism = 0
 
+model = SimpleModel(
+    fecundity,
+    juvenile_survival_probability,
+    adult_survival_probability,
+    strength_cannibalism,
+)
