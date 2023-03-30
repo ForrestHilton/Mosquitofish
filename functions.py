@@ -17,14 +17,14 @@ avg_lifespan_weeks = 104
 adult_die_probability = time_step_weeks/avg_lifespan_weeks
 # this can then be used to calculate chance of survival 
 # in given time interval
-adult_survive_probability = 1 - adult_die_probability
+adult_survival_probability = 1 - adult_die_probability
 
 # in simple model, we assume only death from old age and
 # canabilism; we can assume probability of juvenile surviving
 # to adulthood IN THE ABSENSE of canibilism should be
 # very high (we can assume 1)
 
-juveline_survive_probability = 1
+juvenile_survival_probability = 1 
 
 # Females can give birth to up to 30 at once (assume 15 average)
 avg_births_at_once = 15
@@ -36,4 +36,5 @@ broods_per_lifetime = 3.5
 fecundity = (avg_births_at_once*broods_per_lifetime*time_step_weeks)/avg_lifespan_weeks
 
 
- 
+strength_cannibalism = 0
+
