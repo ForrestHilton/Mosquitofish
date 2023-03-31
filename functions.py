@@ -9,14 +9,14 @@ from model import SimpleModel
 # Simple model functions/parameters
 
 # Time step for initial model is 8 weeks, different for other models
-time_step_weeks = 8 
+time_step_weeks = 8
 
 # Mosquitofish survive about 2 years on average (104 weeks)
 avg_lifespan_weeks = 104
 # This can be used to find probability of dying in a given
 # time interval:
-adult_die_probability = time_step_weeks/avg_lifespan_weeks
-# this can then be used to calculate chance of survival 
+adult_die_probability = time_step_weeks / avg_lifespan_weeks
+# this can then be used to calculate chance of survival
 # in given time interval
 adult_survival_probability = 1 - adult_die_probability
 
@@ -25,7 +25,7 @@ adult_survival_probability = 1 - adult_die_probability
 # to adulthood IN THE ABSENSE of canibilism should be
 # very high (we can assume 1)
 
-juvenile_survival_probability = 1 
+juvenile_survival_probability = 1
 
 # Females can give birth to up to 30 at once (assume 15 average)
 avg_births_at_once = 15
@@ -34,7 +34,9 @@ avg_births_at_once = 15
 broods_per_lifetime = 3.5
 # Thus, to calculate fecundity (number of ones born per year
 # on average) do:
-fecundity = (avg_births_at_once*broods_per_lifetime*time_step_weeks)/avg_lifespan_weeks
+fecundity = (
+    avg_births_at_once * broods_per_lifetime * time_step_weeks
+) / avg_lifespan_weeks
 
 
 strength_cannibalism = 0
