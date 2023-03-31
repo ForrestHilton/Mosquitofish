@@ -28,8 +28,8 @@ class SimpleModel:
         deaths = adults / self.adult_survival_probability  # ostensibly from old age
         maturations = juveniles * self.juvenile_survive_probability - cannibalism
 
-        new_juveniles = births
-        new_adults = adults + maturations - deaths
+        new_juveniles = np.maximum(births, 0)
+        new_adults = np.maximum(adults + maturations - deaths, 0)
 
         return SimpleModel.State(new_juveniles, new_adults)
 
