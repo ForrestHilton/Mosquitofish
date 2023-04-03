@@ -24,7 +24,7 @@ class SimpleModel:
         juveniles, adults = state.juveniles, state.adults
 
         births = self.fecundity * adults
-        cannibalism = self.strength_cannibalism * adults * juveniles
+        cannibalism = self.cannibalism(state)
         maturations = juveniles * self.juvenile_survive_probability - cannibalism
 
         new_juveniles = np.maximum(births, 0)
@@ -49,3 +49,6 @@ class SimpleModel:
             adults_array = np.append(adults_array, current_state.adults)
 
         return juveniles_array, adults_array
+
+    def cannibalism(self, state: State):
+        return self.strength_cannibalism * state.adults * state.juveniles

@@ -47,3 +47,8 @@ model = SimpleModel(
     adult_survival_probability,
     strength_cannibalism,
 )
+
+
+class BevertonHolt(SimpleModel):
+    def cannibalism(self, state: SimpleModel.State):
+        return 1 / (1 + self.strength_cannibalism * state.adults)
