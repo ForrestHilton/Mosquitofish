@@ -6,6 +6,8 @@ in the models when we need them rather than having to redefine them each time
 """
 from model import SimpleModel
 
+import numpy as np # maybe don't need? But probably do
+
 # Simple model functions/parameters
 
 # Time step for initial model is 8 weeks, different for other models
@@ -48,7 +50,61 @@ model = SimpleModel(
     strength_cannibalism,
 )
 
+# Different cannibalism models
+
+# IMPORTANT: I think we have been misinterpreting the cannibalism
+# multipliers. Right now, we are interpreting them as the raw 
+# number of mosquitofish juveniles who are dying before they
+# reach the next generation. I think the correct interpretation
+# is that the multiplier is a term we multiply the juvenile 
+# probability survival with. In model.py, this would correspond
+# to changing:
+# maturations = juveniles * self.juvenile_survive_probability - cannibalism
+# to:
+# maturations = juveniles * self.juvenile_survive_probability * cannibalism  
+# and cannibalism should probably be renamed cannibalism multiplier.
+# These multipliers decrease as the number of adults increases, and thus
+# it makes sense that the number of maturations would decrease
+# with increasing number of adults, but the way we have it set up
+# now, the maturations are increasing with the number of adults.
+# I have not changed the implementation in model.py yet, I'm just
+# putting in new canibalism models; we can change are implementation
+# when we discuss it in class if necessary.
 
 class BevertonHolt(SimpleModel):
     def cannibalism(self, state: SimpleModel.State):
         return 1 / (1 + self.strength_cannibalism * state.adults)
+    
+class Allee(SimpleModel):
+
+    # We need an extra parameter m for this model,
+    # while is >= 1 but close to 1. I'll make this 
+    # a class variable (shared by ALL instances of
+    # the class) for now because I don't know exactly
+    # where best to put it. Justification is that we
+    # don't need it outside the class, but don't want
+    # to change the constructor
+    m_param = 1.01
+
+    # also this cannibalism parameter doesn't make
+    # sense in general
+
+    def cannibalism(self, state: SimpleModel.State):
+        return 1 / (1 + self.strength_cannibalism*((state.adults-self.m_param)**2))
+
+
+# What we thought was the Ricker cannibalism we implemented
+# as default cannibalsim in SimpleModel, but I think this is 
+# the correct implementation
+class Ricker(SimpleModel):
+
+    def cannibalism(self, state: SimpleModel.State):
+        return np.exp(-self.strength_cannibalism*state.adults)
+    
+class Linear(SimpleModel):
+
+    # Another different parameter specific to this model
+    big_m_param = 100
+
+    def cannibalism(self, state: SimpleModel.State):
+        return np.maximum(1 - state.adults / self.big_m_param, 0)
