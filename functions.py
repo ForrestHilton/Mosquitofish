@@ -41,7 +41,7 @@ fecundity = (
 ) / avg_lifespan_weeks
 
 
-strength_cannibalism = 0
+strength_cannibalism = 1
 
 model = SimpleModel(
     fecundity,
@@ -72,7 +72,7 @@ model = SimpleModel(
 # when we discuss it in class if necessary.
 
 class BevertonHolt(SimpleModel):
-    def cannibalism(self, state: SimpleModel.State):
+    def cannibalism_multiplier(self, state: SimpleModel.State):
         return 1 / (1 + self.strength_cannibalism * state.adults)
     
 class Allee(SimpleModel):
@@ -89,7 +89,7 @@ class Allee(SimpleModel):
     # also this cannibalism parameter doesn't make
     # sense in general
 
-    def cannibalism(self, state: SimpleModel.State):
+    def cannibalism_multiplier(self, state: SimpleModel.State):
         return 1 / (1 + self.strength_cannibalism*((state.adults-self.m_param)**2))
 
 
@@ -98,7 +98,7 @@ class Allee(SimpleModel):
 # the correct implementation
 class Ricker(SimpleModel):
 
-    def cannibalism(self, state: SimpleModel.State):
+    def cannibalism_multiplier(self, state: SimpleModel.State):
         return np.exp(-self.strength_cannibalism*state.adults)
     
 class Linear(SimpleModel):
@@ -106,5 +106,42 @@ class Linear(SimpleModel):
     # Another different parameter specific to this model
     big_m_param = 100
 
-    def cannibalism(self, state: SimpleModel.State):
+    def cannibalism_multiplier(self, state: SimpleModel.State):
         return np.maximum(1 - state.adults / self.big_m_param, 0)
+    
+
+strength_can_bev_holt = 0.1
+
+bev_holt_model = BevertonHolt(
+    fecundity,
+    juvenile_survival_probability,
+    adult_survival_probability,
+    strength_can_bev_holt,
+)
+
+strength_can_allee = 0.1
+
+allee_model = Allee(
+    fecundity,
+    juvenile_survival_probability,
+    adult_survival_probability,
+    strength_can_allee,   
+)
+
+strength_can_ricker = 0.1
+
+ricker_model = Ricker(
+    fecundity,
+    juvenile_survival_probability,
+    adult_survival_probability,
+    strength_can_ricker,  
+)
+
+strength_can_linear = 0.1 # actually has no effect currently
+
+linear_model = Linear(
+    fecundity,
+    juvenile_survival_probability,
+    adult_survival_probability,
+    strength_can_linear,
+)
