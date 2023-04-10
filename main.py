@@ -1,39 +1,16 @@
-import matplotlib.pyplot as plt
-from model import SimpleModel
 import functions as fn
 from graph import ordinary_plot_over_time
 
-# Create a new instance of the model
+if __name__ == "__main__":
 
-# Run the model for 20 time steps starting with 10 juveniles and 20 adults
-juveniles, adults = fn.model.run(SimpleModel.State(100, 100), 20)
+    # Beverton Holt
+    ordinary_plot_over_time(fn.bev_holt_model, 20)
 
-ordinary_plot_over_time(juveniles, adults)
+    # Allee
+    ordinary_plot_over_time(fn.allee_model, 20)
 
-# Now experiment with different cannibalism models
+    # Ricker
+    ordinary_plot_over_time(fn.ricker_model, 20)
 
-# Beverton Holt
-
-juveniles, adults = fn.bev_holt_model.run(SimpleModel.State(100, 100), 20)
-
-ordinary_plot_over_time(juveniles, adults)
-
-# Allee
-
-juveniles, adults = fn.allee_model.run(SimpleModel.State(100, 100), 20)
-
-ordinary_plot_over_time(juveniles, adults)
-
-# Ricker
-
-juveniles, adults = fn.ricker_model.run(SimpleModel.State(100, 100), 20)
-
-ordinary_plot_over_time(juveniles, adults)
-
-# Linear
-
-juveniles, adults = fn.linear_model.run(SimpleModel.State(100, 100), 20)
-
-ordinary_plot_over_time(juveniles, adults)
-
-
+    # Linear
+    ordinary_plot_over_time(fn.linear_model, 20)

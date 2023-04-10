@@ -1,22 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from model import SimpleModel
+import functions as fn
 
 
-def ordinary_plot_over_time(juveniles, adults):
+def ordinary_plot_over_time(model: SimpleModel, steps: int):
+    # Run the model for 20 time steps starting with 10 juveniles and 20 adults
+    juveniles, adults = model.run(SimpleModel.State(100, 100), 20)
+
     plt.plot(range(len(juveniles)), list(juveniles), label="Juveniles")
     plt.plot(range(len(adults)), list(adults), label="Adults")
     plt.xlabel("Time step")
     plt.ylabel("Population")
     plt.legend()
+    plt.title(type(model).__name__)
     plt.show()
+
 
 def show_interactive_2d_seedspace(model, juviniles_max, adults_max):
     def run(x: float, y: float, iterations: int) -> tuple[np.ndarray, np.ndarray]:
         return model.run(SimpleModel.State(x, y), iterations)
 
     # Generate 20 points using the run function
-    x, y = run(0, 0, 20)
+    x, y = run(1, 1, 20)
 
     # Initialize the plot
     fig, ax = plt.subplots()
@@ -31,8 +37,9 @@ def show_interactive_2d_seedspace(model, juviniles_max, adults_max):
         scale=1,
     )
     # Set the limits of the plot
-    ax.set_xlim(0, 1000)
-    ax.set_ylim(0, 1000)
+    ax.set_xlim(0, juviniles_max)
+    ax.set_ylim(0, adults_max)
+    ax.set_title(type(model).__name__)
 
     # ax.set_xscale('log')
     # ax.set_yscale('log')
@@ -54,3 +61,7 @@ def show_interactive_2d_seedspace(model, juviniles_max, adults_max):
     ax.set_ylabel("Adults")
 
     plt.show()
+
+
+if __name__ == "__main__":
+    show_interactive_2d_seedspace(fn.linear_model, 1000, 500)
