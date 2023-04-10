@@ -1,16 +1,19 @@
 import functions as fn
-from graph import ordinary_plot_over_time
+import graph
 
 if __name__ == "__main__":
+    graph.sensitivity_run(
+        [fn.bev_holt_model, fn.allee_model, fn.ricker_model, fn.linear_model]
+    )
 
     # Beverton Holt
-    ordinary_plot_over_time(fn.bev_holt_model, 20)
+    graph.ordinary_plot_over_time(fn.bev_holt_model, 20)
 
     # Allee
-    ordinary_plot_over_time(fn.allee_model, 20)
+    graph.ordinary_plot_over_time(fn.allee_model, 20)
 
     # Ricker
-    ordinary_plot_over_time(fn.ricker_model, 20)
+    graph.ordinary_plot_over_time(fn.ricker_model, 20)
 
     # Linear
-    ordinary_plot_over_time(fn.linear_model, 20)
+    graph.ordinary_plot_over_time(fn.linear_model, 20)

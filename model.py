@@ -19,6 +19,9 @@ class SimpleModel:
         self.adult_survival_probability = adult_survival_probability
         self.strength_cannibalism = strength_cannibalism
 
+    def description(self):
+        return type(self).__name__
+
     def run_one_time_step(self, state: "SimpleModel.State") -> "SimpleModel.State":
         "takes a State object and returns a new State object representing the next time step"
         juveniles, adults = state.juveniles, state.adults
