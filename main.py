@@ -1,4 +1,5 @@
 import functions as fn
+import competition_model as cm
 import graph
 
 if __name__ == "__main__":
@@ -17,3 +18,5 @@ if __name__ == "__main__":
 
     # Linear
     graph.ordinary_plot_over_time(fn.linear_model, 20)
+
+    graph.ordinary_plot_over_time(cm.competition_model,20)
