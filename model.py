@@ -34,13 +34,33 @@ class SimpleModel:
 
     def run_one_time_step(self, state: "SimpleModel.State") -> "SimpleModel.State":
         "takes a State object and returns a new State object representing the next time step"
+        # Set up temporary varaibles for adults and juvelines
         juveniles, adults = state.juveniles, state.adults
 
+        # Births is a flow. Fecundity is nummber of births per year
+        # per adult, adults is the number of adult mosquitofish,
+        # births is thus the number of juvelines born per year
         births = self.fecundity * adults
-        cannibalism_mult = self.cannibalism_multiplier(state)
+        cannibalism_mult = self.cannibalism_multiplier(state) # temporary variable
+        # Maturations is a flow, and it represents how many juvelines
+        # mature and thus become adults in the next time step. 
+        # Juvelines have a certain survival probability on their own
+        # in absense of cannibalism, so this probabiliy is multiplied
+        # by the number of juvelines. Cannibalism_mult represents the
+        # probability a juvenile survives if cannibalism is present,
+        # ignoring the other survival probability, and get mutliplied
+        # by juveniles and the survival probability to yield maturations.
         maturations = juveniles * self.juvenile_survive_probability * cannibalism_mult
 
+        # Number of new juvelines each year is the number that
+        # are born each year. Cannot have less than 0 juveniles,
+        # hence numpy.maximum is used. 
         new_juveniles = np.maximum(births, 0)
+        # Adults have a particular survival probability, so the
+        # number of adults that keep surviving from the last time
+        # step is adults * adult survival probability, and there
+        # are also new adults from juvelines maturing. Also
+        # can't have less than 0 adults. 
         new_adults = np.maximum(
             adults * self.adult_survival_probability + maturations, 0
         )
