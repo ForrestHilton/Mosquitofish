@@ -74,20 +74,24 @@ model = SimpleModel(
 class BevertonHolt(SimpleModel):
     def cannibalism_multiplier(self, state: SimpleModel.State):
         return 1 / (1 + self.strength_cannibalism * state.adults)
+
     
 class Allee(SimpleModel):
 
-    # We need an extra parameter m for this model,
-    # while is >= 1 but close to 1. I'll make this 
-    # a class variable (shared by ALL instances of
-    # the class) for now because I don't know exactly
-    # where best to put it. Justification is that we
-    # don't need it outside the class, but don't want
-    # to change the constructor
-    m_param = 1.01
+    def __init__(
+        self,
+        fecundity: float,
+        juvenile_survive_probability: float,
+        adult_survival_probability: float,
+        strength_cannibalism: float,
+        m_param: float
+    ) -> None:
+        self.fecundity = fecundity
+        self.juvenile_survive_probability = juvenile_survive_probability
+        self.adult_survival_probability = adult_survival_probability
+        self.strength_cannibalism = strength_cannibalism
+        self.m_param = m_param
 
-    # also this cannibalism parameter doesn't make
-    # sense in general
 
     def cannibalism_multiplier(self, state: SimpleModel.State):
         return 1 / (1 + self.strength_cannibalism*((state.adults-self.m_param)**2))
@@ -104,7 +108,17 @@ class Ricker(SimpleModel):
 class Linear(SimpleModel):
 
     # Another different parameter specific to this model
-    big_m_param = 100
+    def __init__(
+        self,
+        fecundity: float,
+        juvenile_survive_probability: float,
+        adult_survival_probability: float,
+        big_m_param: float,
+    ) -> None:
+        self.fecundity = fecundity
+        self.juvenile_survive_probability = juvenile_survive_probability
+        self.adult_survival_probability = adult_survival_probability
+        self.big_m_param = big_m_param
 
     def cannibalism_multiplier(self, state: SimpleModel.State):
         return np.maximum(1 - state.adults / self.big_m_param, 0)
@@ -121,11 +135,17 @@ bev_holt_model = BevertonHolt(
 
 strength_can_allee = 0.1
 
+# We need an extra parameter m for the Allee model,
+# which is >= 1 but close to 1.
+
+allee_m_param = 1.01
+
 allee_model = Allee(
     fecundity,
     juvenile_survival_probability,
     adult_survival_probability,
     strength_can_allee,   
+    allee_m_param,
 )
 
 strength_can_ricker = 0.1
@@ -137,11 +157,11 @@ ricker_model = Ricker(
     strength_can_ricker,  
 )
 
-strength_can_linear = 0.1 # actually has no effect currently
+big_m_linear = 100 
 
 linear_model = Linear(
     fecundity,
     juvenile_survival_probability,
     adult_survival_probability,
-    strength_can_linear,
+    big_m_linear,
 )

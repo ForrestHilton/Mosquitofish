@@ -38,6 +38,7 @@ class CompetitionModel:
         births = self.fecundity * adults
         cannibalism_mult = self.cannibalism_multiplier(state)
         maturations = juveniles * self.juvenile_survive_probability * cannibalism_mult
+        # 
         competition_deaths = state.adults*state.adults/self.K
 
         new_juveniles = np.maximum(births, 0)
@@ -64,7 +65,7 @@ class CompetitionModel:
         return juveniles_array, adults_array
 
     def cannibalism_multiplier(self, state: State):
-        # Ricker competition
+        # Ricker competition, as specified in the instructions
         return np.exp(-self.strength_cannibalism*state.adults)
     
 # Object for use in main -- need to import functions for
@@ -72,5 +73,5 @@ competition_model = CompetitionModel(
     fn.fecundity,
     fn.juvenile_survival_probability,
     fn.adult_survival_probability,
-    fn.strength_can_linear,
+    fn.strength_can_ricker,
 )

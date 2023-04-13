@@ -3,11 +3,19 @@ import numpy as np
 
 class SimpleModel:
     class State:
+
+        """State is an inner class of SimpleModel which holds information
+        about what would be the stocks in a Stella model: number of 
+        juveniles and number of adults"""
+
         def __init__(self, juveniles: float, adults: float):
             self.juveniles = juveniles
             self.adults = adults
 
     def __init__(
+        # Constructor: initializes all the instance variables,
+        # which are convertors and can be thought of as
+        # parameters since they are constant. 
         self,
         fecundity: float,
         juvenile_survive_probability: float,
@@ -20,6 +28,8 @@ class SimpleModel:
         self.strength_cannibalism = strength_cannibalism
 
     def description(self):
+        # This is so functions in graphs.py can title graphs based 
+        # on the type of model by class 
         return type(self).__name__
 
     def run_one_time_step(self, state: "SimpleModel.State") -> "SimpleModel.State":
