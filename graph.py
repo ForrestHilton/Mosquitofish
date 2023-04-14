@@ -5,6 +5,7 @@ from model import SimpleModel
 import functions as fn
 from matplotlib.widgets import Slider, Button
 from frymodel import fry_model, FryModel
+import inspect
 
 
 def ordinary_plot_over_time(model: SimpleModel, steps: int):
@@ -86,17 +87,21 @@ def sensitivity_run(
 def show_interactive_3d_seedspace(
     model: FryModel, fry_max, juviniles_max, adults_max, iterations: int
 ):
-    plt.subplots_adjust(bottom=0.35)
-    # Create 3 axes for 3 sliders red,green and blue
-    axfry = plt.axes([0.25, 0.2, 0.65, 0.03])
-    axjuviniles = plt.axes([0.25, 0.15, 0.65, 0.03])
-    axaudlts = plt.axes([0.25, 0.1, 0.65, 0.03])
+    parameter_sliders = {}
 
-    # Create a slider from 0.0 to 1.0 in axes axred
-    # with 0.6 as initial value.
-    fry_slider = Slider(axfry, "Fry", 0.0, fry_max, 1)
-    juvinililes_slider = Slider(axjuviniles, "Juviniles", 0.0, juviniles_max, 1)
-    adults_slider = Slider(axaudlts, "Adults", 0.0, adults_max, 1)
+    for i, key in enumerate(model.__dict__):
+        val = model.__dict__[key]
+        parameter_sliders[key] = Slider(
+            plt.axes([0.35, 0.95 - i * 0.05, 0.55, 0.03]), key, 0.0, val * 5, val
+        )
+
+    fry_slider = Slider(plt.axes([0.25, 0.2, 0.65, 0.03]), "Fry", 0.0, fry_max, 1)
+    juvinililes_slider = Slider(
+        plt.axes([0.25, 0.15, 0.65, 0.03]), "Juviniles", 0.0, juviniles_max, 1
+    )
+    adults_slider = Slider(
+        plt.axes([0.25, 0.1, 0.65, 0.03]), "Adults", 0.0, adults_max, 1
+    )
 
     # Create axes for reset button and create button
     resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
@@ -112,6 +117,9 @@ def show_interactive_3d_seedspace(
         initial = FryModel.State(
             fry_slider.val, juvinililes_slider.val, adults_slider.val
         )
+        for key in model.__dict__:
+            model.__dict__[key] = parameter_sliders[key].val
+
         fry_x, juviniles_y, adults_z = model.run(initial, iterations)
         ax.scatter(fry_x, juviniles_y, adults_z, c="b", marker="o")
 
@@ -122,7 +130,6 @@ def show_interactive_3d_seedspace(
             dy = juviniles_y[i + 1] - juviniles_y[i]
             dz = adults_z[i + 1] - adults_z[i]
             ax.quiver(fry_x[i], juviniles_y[i], adults_z[i], dx, dy, dz, color="black")
-
 
         ax.set_xlim(0, fry_max)
         ax.set_ylim(0, juviniles_max)
@@ -136,18 +143,15 @@ def show_interactive_3d_seedspace(
 
     update(None)
 
-    # Call update function when slider value is changed
-    fry_slider.on_changed(update)
-    juvinililes_slider.on_changed(update)
-    adults_slider.on_changed(update)
+    for slider in list(parameter_sliders.values()) + [fry_slider, juvinililes_slider, adults_slider]:
+        slider.on_changed(update)
 
     # Create a function resetSlider to set slider to
     # initial values when Reset button is clicked
 
     def resetSlider(event):
-        fry_slider.reset()
-        juvinililes_slider.reset()
-        adults_slider.reset()
+        for slider in list(parameter_sliders.values()) + [fry_slider, juvinililes_slider, adults_slider]:
+            slider.reset()
 
     # Call resetSlider function when clicked on reset button
     button.on_clicked(resetSlider)
