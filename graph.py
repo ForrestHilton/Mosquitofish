@@ -3,14 +3,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import SimpleModel
 import functions as fn
+from matplotlib.widgets import Slider, Button
+from frymodel import fry_model, FryModel
 
 
 def ordinary_plot_over_time(model: SimpleModel, steps: int):
     # Run the model for 20 time steps starting with 10 juveniles and 20 adults
-    juveniles, adults = model.run(SimpleModel.State(100, 100), 20)
+    juveniles, adults = model.run(SimpleModel.State(100, 100), steps)
 
-    plt.plot(range(len(juveniles)), list(juveniles), label="Juveniles")
-    plt.plot(range(len(adults)), list(adults), label="Adults")
+    plt.plot(range(steps), list(juveniles), label="Juveniles")
+    plt.plot(range(steps), list(adults), label="Adults")
     plt.xlabel("Time step")
     plt.ylabel("Population")
     plt.legend()
@@ -23,16 +25,16 @@ def show_interactive_2d_seedspace(model, juviniles_max, adults_max, iterations: 
         return model.run(SimpleModel.State(x, y), iterations)
 
     # Generate 20 points using the run function
-    x, y = run(1, 1)
+    juviniles_x, audults_y = run(1, 1)
 
     # Initialize the plot
     fig, ax = plt.subplots()
-    (line,) = ax.plot(x, y, "-o")
+    (line,) = ax.plot(juviniles_x, audults_y, "-o")
     arrow = ax.quiver(
-        x[:-1],
-        y[:-1],
-        x[1:] - x[:-1],
-        y[1:] - y[:-1],
+        juviniles_x[:-1],
+        audults_y[:-1],
+        juviniles_x[1:] - juviniles_x[:-1],
+        audults_y[1:] - audults_y[:-1],
         scale_units="xy",
         angles="xy",
         scale=1,
@@ -42,8 +44,6 @@ def show_interactive_2d_seedspace(model, juviniles_max, adults_max, iterations: 
     ax.set_ylim(0, adults_max)
     ax.set_title(model.description())
 
-    # ax.set_xscale('log')
-    # ax.set_yscale('log')
     # Define the function to update the plot based on the new first point
     def update_plot(event):
         if event.inaxes == ax:
@@ -70,7 +70,11 @@ def sensitivity_run(
     list_adults = []
     for model in models:
         _, adults = model.run(initial, iterations)
-        plt.plot(range(iterations), list(adults), label=model.description() + " Adult Population")
+        plt.plot(
+            range(iterations),
+            list(adults),
+            label=model.description() + " Adult Population",
+        )
         list_adults.append(adults)
 
     plt.xlabel("Time step")
@@ -79,5 +83,77 @@ def sensitivity_run(
     plt.show()
 
 
+def show_interactive_3d_seedspace(
+    model: FryModel, fry_max, juviniles_max, adults_max, iterations: int
+):
+    plt.subplots_adjust(bottom=0.35)
+    # Create 3 axes for 3 sliders red,green and blue
+    axfry = plt.axes([0.25, 0.2, 0.65, 0.03])
+    axjuviniles = plt.axes([0.25, 0.15, 0.65, 0.03])
+    axaudlts = plt.axes([0.25, 0.1, 0.65, 0.03])
+
+    # Create a slider from 0.0 to 1.0 in axes axred
+    # with 0.6 as initial value.
+    fry_slider = Slider(axfry, "Fry", 0.0, fry_max, 1)
+    juvinililes_slider = Slider(axjuviniles, "Juviniles", 0.0, juviniles_max, 1)
+    adults_slider = Slider(axaudlts, "Adults", 0.0, adults_max, 1)
+
+    # Create axes for reset button and create button
+    resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
+    button = Button(resetax, "Reset", color="gold", hovercolor="skyblue")
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection="3d")
+    # Create function to be called when slider value is changed
+    # Set the limits of the plot
+
+    def update(val):
+        ax.clear()
+        initial = FryModel.State(
+            fry_slider.val, juvinililes_slider.val, adults_slider.val
+        )
+        fry_x, juviniles_y, adults_z = model.run(initial, iterations)
+        ax.scatter(fry_x, juviniles_y, adults_z, c="b", marker="o")
+
+        # Connect consecutive points with lines
+        # Add arrows to indicate direction
+        for i in range(len(fry_x) - 1):
+            dx = fry_x[i + 1] - fry_x[i]
+            dy = juviniles_y[i + 1] - juviniles_y[i]
+            dz = adults_z[i + 1] - adults_z[i]
+            ax.quiver(fry_x[i], juviniles_y[i], adults_z[i], dx, dy, dz, color="black")
+
+
+        ax.set_xlim(0, fry_max)
+        ax.set_ylim(0, juviniles_max)
+        ax.set_zlim(0, adults_max)
+        ax.set_title(model.description())
+
+        ax.set_xlabel("Fry")
+        ax.set_ylabel("Juveniles")
+        ax.set_zlabel("Adults")
+        fig.canvas.draw()
+
+    update(None)
+
+    # Call update function when slider value is changed
+    fry_slider.on_changed(update)
+    juvinililes_slider.on_changed(update)
+    adults_slider.on_changed(update)
+
+    # Create a function resetSlider to set slider to
+    # initial values when Reset button is clicked
+
+    def resetSlider(event):
+        fry_slider.reset()
+        juvinililes_slider.reset()
+        adults_slider.reset()
+
+    # Call resetSlider function when clicked on reset button
+    button.on_clicked(resetSlider)
+    plt.show()
+
+
 if __name__ == "__main__":
-    show_interactive_2d_seedspace(fn.linear_model, 1000, 500, 100)
+    show_interactive_3d_seedspace(fry_model, 800, 100, 400, 20)
+    # show_interactive_2d_seedspace(fn.linear_model, 1000, 500, 20)

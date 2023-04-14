@@ -96,54 +96,6 @@ def ordinary_plot_over_time(model: FryModel, steps: int):
     plt.show()
 
 
-def show_interactive_3d_seedspace(
-    model: FryModel, fry_max, juviniles_max, adults_max, iterations: int
-):
-    def run(x: float, y: float, z: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        return model.run(FryModel.State(x, y, z), iterations)
-
-    # Generate 20 points using the run function
-    x, y = run(1, 1, 1)
-
-    # Initialize the plot
-    fig, ax = plt.subplots()
-    (line,) = ax.plot(x, y, "-o")
-    arrow = ax.quiver(
-        x[:-1],
-        y[:-1],
-        x[1:] - x[:-1],
-        y[1:] - y[:-1],
-        scale_units="xy",
-        angles="xy",
-        scale=1,
-    )
-    # Set the limits of the plot
-    ax.set_xlim(0, juviniles_max)
-    ax.set_ylim(0, adults_max)
-    ax.set_title(model.description())
-
-    # ax.set_xscale('log')
-    # ax.set_yscale('log')
-    # Define the function to update the plot based on the new first point
-    def update_plot(event):
-        if event.inaxes == ax:
-            x, y = run(event.xdata, event.ydata)
-            line.set_data(x, y)
-            arrow.set_offsets(np.c_[x[:-1], y[:-1]])
-            arrow.set_UVC(x[1:] - x[:-1], y[1:] - y[:-1])
-            fig.canvas.draw()
-
-    # Connect the function to the mouse click event
-    cid = fig.canvas.mpl_connect("button_press_event", update_plot)
-
-    # Set the title and axis labels
-    # ax.set_title('')
-    ax.set_xlabel("Juveniles")
-    ax.set_ylabel("Adults")
-
-    plt.show()
-
-
 strength_can_ricker = 0.01
 
 fry_model = FryModel(
@@ -154,5 +106,5 @@ fry_model = FryModel(
 )
 
 
-ordinary_plot_over_time(fry_model, 40)
-# show_interactive_3d_seedspace(fry_model, 100, 400, 800)
+# ordinary_plot_over_time(fry_model, 40)
+# show_interactive_3d_seedspace(fry_model, 800, 100, 400, 20)
