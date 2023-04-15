@@ -42,15 +42,15 @@ class SimpleModel:
 
         self.juvenile_survival_probability = 1
 
-        # Females can give birth to up to 30 at once (assume 15 average)
-        avg_births_at_once = 15
+        # Females can give birth to up to 30 young per brood (assume 15 average)
+        avg_births_per_brood = 15
         # Each female can produce three to four broods in her lifetime
         # https://www.shelbytnhealth.com/487/Mosquito-Fish-for-Ponds
         broods_per_lifetime = 3.5
-        # Thus, to calculate fecundity (number of ones born per year
+        # Thus, to calculate fecundity (number of young born per year
         # on average) do:
         self.fecundity = (
-            avg_births_at_once * broods_per_lifetime * time_step_weeks
+            avg_births_per_brood * broods_per_lifetime * time_step_weeks
         ) / avg_lifespan_weeks
 
     def description(self):
@@ -73,8 +73,8 @@ class SimpleModel:
         # Juvelines have a certain survival probability on their own
         # in absense of cannibalism, so this probabiliy is multiplied
         # by the number of juvelines. Cannibalism_mult represents the
-        # probability a juvenile survives if cannibalism is present,
-        # ignoring the other survival probability, and get mutliplied
+        # probability of a juvenile surviving if cannibalism is present,
+        # ignoring the other survival probability, and gets mutliplied
         # by juveniles and the survival probability to yield maturations.
         maturations = juveniles * self.juvenile_survival_probability * cannibalism_mult
 
