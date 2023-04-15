@@ -1,22 +1,6 @@
 import numpy as np
 import math
 
-# Time step for initial model is 8 weeks, different for other models
-time_step_weeks = 8
-
-# Mosquitofish survive about 2 years on average (104 weeks)
-avg_lifespan_weeks = 104
-
-# This can be used to find probability of dying in a given
-# time interval:
-adult_die_probability = time_step_weeks / avg_lifespan_weeks
-
-# Females can give birth to up to 30 at once (assume 15 average)
-avg_births_at_once = 15
-# Each female can produce three to four broods in her lifetime
-# https://www.shelbytnhealth.com/487/Mosquito-Fish-for-Ponds
-broods_per_lifetime = 3.5
-
 
 class SimpleModel:
     class State:
@@ -34,25 +18,40 @@ class SimpleModel:
         # which are convertors and can be thought of as
         # parameters since they are constant.
         self,
+        # Time step for initial model is 8 weeks, different for other models
+        time_step_weeks=8,
+    ) -> None:
+        # simple model functions/parameters
+
+        # Mosquitofish survive about 2 years on average (104 weeks)
+        avg_lifespan_weeks = 104
+
         # duration is twice the average life span for starters
-        iterations=math.floor(avg_lifespan_weeks / time_step_weeks * 2),
-        # to calculate fecundity (number of ones born per year
-        # on average) do:
-        fecundity=(avg_births_at_once * broods_per_lifetime * time_step_weeks)
-        / avg_lifespan_weeks,
+        self.iterations = math.floor(avg_lifespan_weeks / time_step_weeks * 2)
+        # This can be used to find probability of dying in a given
+        # time interval:
+        adult_die_probability = time_step_weeks / avg_lifespan_weeks
+        # this can then be used to calculate chance of survival
+        # in given time interval
+        self.adult_survival_probability = 1 - adult_die_probability
+
         # in simple model, we assume only death from old age and
         # canabilism; we can assume probability of juvenile surviving
         # to adulthood IN THE ABSENSE of canibilism should be
         # very high (we can assume 1)
-        juvenile_survival_probability=1,
-        # this can then be used to calculate chance of survival
-        # in given time interval
-        adult_survival_probability=1 - adult_die_probability,
-    ) -> None:
-        self.iterations = iterations
-        self.fecundity = fecundity
-        self.juvenile_survival_probability = juvenile_survival_probability
-        self.adult_survival_probability = adult_survival_probability
+
+        self.juvenile_survival_probability = 1
+
+        # Females can give birth to up to 30 at once (assume 15 average)
+        avg_births_at_once = 15
+        # Each female can produce three to four broods in her lifetime
+        # https://www.shelbytnhealth.com/487/Mosquito-Fish-for-Ponds
+        broods_per_lifetime = 3.5
+        # Thus, to calculate fecundity (number of ones born per year
+        # on average) do:
+        self.fecundity = (
+            avg_births_at_once * broods_per_lifetime * time_step_weeks
+        ) / avg_lifespan_weeks
 
     def description(self):
         # This is so functions in graphs.py can title graphs based
@@ -94,9 +93,7 @@ class SimpleModel:
 
         return SimpleModel.State(new_juveniles, new_adults)
 
-    def run(
-        self, initial: "SimpleModel.State"
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def run(self, initial: "SimpleModel.State") -> tuple[np.ndarray, np.ndarray]:
         "takes a initial condition and produces a tuple of numpy arrays (juveniles, adults)"
         self.iterations = math.floor(self.iterations)
 

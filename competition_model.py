@@ -8,10 +8,9 @@ term is included. Ricker cannibalism is used."""
 class CompetitionModel(Ricker):
     def __init__(
         self,
-        cm_competion_param=1000,
     ) -> None:
         super().__init__()
-        self.competition_param = cm_competion_param
+        self.competition_param = 1000
 
     def run_one_time_step(
         self, state: "SimpleModel.State"

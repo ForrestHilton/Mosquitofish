@@ -5,20 +5,8 @@ import math
 
 class FryModel(Ricker):
     def __init__(self):
-        super().__init__()
         # adjustments for halving time step
-        # please refer to model.py for further documentation
-
-        time_step_weeks = 4
-        avg_lifespan_weeks = 104
-        adult_die_probability = time_step_weeks / avg_lifespan_weeks
-        avg_births_at_once = 15
-        broods_per_lifetime = 3.5
-        self.iterations = math.floor(avg_lifespan_weeks / time_step_weeks * 2)
-        self.fecundity = (
-            avg_births_at_once * broods_per_lifetime * time_step_weeks
-        ) / avg_lifespan_weeks
-        self.adult_survival_probability = 1 - adult_die_probability
+        super().__init__(time_step_weeks=4)
 
     class State:
         def __init__(self, fry: float, juveniles: float, adults: float):

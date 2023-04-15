@@ -17,10 +17,9 @@ import numpy as np
 class BevertonHolt(SimpleModel):
     def __init__(
         self,
-        strength_can_bev_holt=0.1,
     ):
         super().__init__()
-        self.strength_can_bev_holt = strength_can_bev_holt
+        self.strength_can_bev_holt = 0.1
 
     def cannibalism_multiplier(self, state: SimpleModel.State):
         return 1 / (1 + self.strength_can_bev_holt * state.adults)
@@ -29,14 +28,12 @@ class BevertonHolt(SimpleModel):
 class Allee(SimpleModel):
     def __init__(
         self,
-        strength_can_allee=0.1,
-        # We need an extra parameter m for the Allee model,
-        # which is >= 1 but close to 1.
-        allee_m_param=1.01,
     ) -> None:
         super().__init__()
-        self.strength_cannibalism = strength_can_allee
-        self.m_param = allee_m_param
+        self.strength_cannibalism = 0.1
+        # We need an extra parameter m for the Allee model,
+        # which is >= 1 but close to 1.
+        self.m_param = 1.01
 
     def cannibalism_multiplier(self, state: SimpleModel.State):
         return 1 / (
@@ -47,10 +44,10 @@ class Allee(SimpleModel):
 class Ricker(SimpleModel):
     def __init__(
         self,
-        strength_can_ricker=0.1,
+        time_step_weeks=8,
     ) -> None:
-        super().__init__()
-        self.strength_cannibalism = strength_can_ricker
+        super().__init__(time_step_weeks=time_step_weeks)
+        self.strength_cannibalism = 0.1
 
     def cannibalism_multiplier(self, state: SimpleModel.State):
         return np.exp(-self.strength_cannibalism * state.adults)
@@ -59,10 +56,9 @@ class Ricker(SimpleModel):
 class Linear(SimpleModel):
     def __init__(
         self,
-        big_m_linear=100,
     ) -> None:
         super().__init__()
-        self.big_m_param = big_m_linear
+        self.big_m_param = 100
 
     def cannibalism_multiplier(self, state: SimpleModel.State):
         return np.maximum(1 - state.adults / self.big_m_param, 0)
