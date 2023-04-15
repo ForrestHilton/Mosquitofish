@@ -11,7 +11,18 @@ import numpy as np
 
 # These multipliers decrease as the number of adults increases, and thus
 # it makes sense that the number of maturations would decrease
-# with increasing number of adults.
+# with increasing number of adults. Each of the multipliers is formally
+# justified in the population dynamics literature.
+
+# These cannibalism models inherit from the SimpleModel class and are
+# otherwise very similar. The cannibalism_multiplier function is 
+# overrriden so that each model can implement its own equation
+# indirectly used to calculate deaths from cannibalism. They require
+# parameters corresponding to how strong the cannibalism is, and in
+# general as this parameter increases the number of deaths from 
+# cannibalism increases and the corresponding number of maturations
+# is smaller. However, some models have different or additional 
+# parameters which are documented below.  
 
 
 class BevertonHolt(SimpleModel):
@@ -58,6 +69,11 @@ class Linear(SimpleModel):
         self,
     ) -> None:
         super().__init__()
+        # The linear model requires a large, positive constant
+        # referred to as M, and as M increases, the number of
+        # deaths from cannibalism actually decreases. Thus,
+        # this variable is referreed to as a parameter rather
+        # than a strength.  
         self.big_m_param = 100
 
     def cannibalism_multiplier(self, state: SimpleModel.State):

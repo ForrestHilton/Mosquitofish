@@ -47,7 +47,7 @@ class SimpleModel:
         # Each female can produce three to four broods in her lifetime
         # https://www.shelbytnhealth.com/487/Mosquito-Fish-for-Ponds
         broods_per_lifetime = 3.5
-        # Thus, to calculate fecundity (number of young born per year
+        # Thus, to calculate fecundity (number of young born per adult per year
         # on average) do:
         self.fecundity = (
             avg_births_per_brood * broods_per_lifetime * time_step_weeks
@@ -95,12 +95,24 @@ class SimpleModel:
 
     def run(self, initial: "SimpleModel.State") -> tuple[np.ndarray, np.ndarray]:
         "takes a initial condition and produces a tuple of numpy arrays (juveniles, adults)"
+        # We want to make sure the number of iterations is a 
+        # whole number, so we use the floor function
         self.iterations = math.floor(self.iterations)
 
+        # This function is going to return arrays representing
+        # the number of juvenlines and adults that exist at each
+        # time step in the simulation so this data can be graphed.
+        # Here, we're setting up the initial state of the simulation
+        # and loading the initial state (number of juveniles and
+        # adults) into the appropriate arrays. 
         current_state = initial
         juveniles_array = np.array([initial.juveniles])
         adults_array = np.array([initial.adults])
 
+        # In this loop, we run a series of time steps one after
+        # the other, each depending on the one before, in a manner
+        # similar to Euler's method. Each time we have a new state
+        # we append the data to the appropriate arrays. 
         for _ in range(self.iterations - 1):
             current_state = self.run_one_time_step(current_state)
             juveniles_array = np.append(juveniles_array, current_state.juveniles)
@@ -109,5 +121,5 @@ class SimpleModel:
         return juveniles_array, adults_array
 
     def cannibalism_multiplier(self, state: State):
-        # No cannibalism in default model -> juveline survival not affected
+        # No cannibalism in default model -> juvenile survival not affected
         return 1
