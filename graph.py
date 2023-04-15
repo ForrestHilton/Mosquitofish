@@ -2,18 +2,16 @@ from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 from model import SimpleModel
-import functions as fn
 from matplotlib.widgets import Slider, Button
-from frymodel import fry_model, FryModel
-import inspect
+from frymodel import FryModel, fry_model
 
 
-def ordinary_plot_over_time(model: SimpleModel, steps: int):
+def ordinary_plot_over_time(model: SimpleModel):
     # Run the model for 20 time steps starting with 10 juveniles and 20 adults
-    juveniles, adults = model.run(SimpleModel.State(100, 100), steps)
+    juveniles, adults = model.run(SimpleModel.State(100, 100))
 
-    plt.plot(range(steps), list(juveniles), label="Juveniles")
-    plt.plot(range(steps), list(adults), label="Adults")
+    plt.plot(range(model.iterations), list(juveniles), label="Juveniles")
+    plt.plot(range(model.iterations), list(adults), label="Adults")
     plt.xlabel("Time step")
     plt.ylabel("Population")
     plt.legend()
@@ -21,7 +19,7 @@ def ordinary_plot_over_time(model: SimpleModel, steps: int):
     plt.show()
 
 
-def show_interactive_2d_seedspace(model, juviniles_max, adults_max, iterations: int):
+def show_interactive_2d_seedspace(model, juviniles_max, adults_max):
     parameter_sliders = {}
 
     for i, key in enumerate(model.__dict__):
@@ -31,7 +29,7 @@ def show_interactive_2d_seedspace(model, juviniles_max, adults_max, iterations: 
         )
 
     def run(x: float, y: float) -> tuple[np.ndarray, np.ndarray]:
-        return model.run(SimpleModel.State(x, y), iterations)
+        return model.run(SimpleModel.State(x, y))
 
     resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
     button = Button(resetax, "Reset", color="gold", hovercolor="skyblue")
@@ -43,7 +41,7 @@ def show_interactive_2d_seedspace(model, juviniles_max, adults_max, iterations: 
 
     def draw_figure():
         ax.clear()
-        juviniles_x, audults_y = model.run(initial, iterations)
+        juviniles_x, audults_y = model.run(initial)
         ax.plot(juviniles_x, audults_y, "-o")
         ax.quiver(
             juviniles_x[:-1],
@@ -95,7 +93,7 @@ def show_interactive_2d_seedspace(model, juviniles_max, adults_max, iterations: 
 
 
 def show_interactive_3d_seedspace(
-    model: FryModel, fry_max, juviniles_max, adults_max, iterations: int
+    model: FryModel, fry_max, juviniles_max, adults_max
 ):
     parameter_sliders = {}
 
@@ -130,7 +128,7 @@ def show_interactive_3d_seedspace(
         for key in model.__dict__:
             model.__dict__[key] = parameter_sliders[key].val
 
-        fry_x, juviniles_y, adults_z = model.run(initial, iterations)
+        fry_x, juviniles_y, adults_z = model.run(initial)
         ax.scatter(fry_x, juviniles_y, adults_z, c="b", marker="o")
 
         # Connect consecutive points with lines
@@ -181,7 +179,7 @@ def sensitivity_run(
 ):
     list_adults = []
     for model in models:
-        _, adults = model.run(initial, iterations)
+        _, adults = model.run(initial)
         plt.plot(
             range(iterations),
             list(adults),
@@ -196,5 +194,5 @@ def sensitivity_run(
 
 
 if __name__ == "__main__":
-    # show_interactive_3d_seedspace(fry_model, 800, 100, 400, 20)
-    show_interactive_2d_seedspace(fn.linear_model, 1000, 500, 20)
+    show_interactive_3d_seedspace(fry_model, 800, 100, 400)
+    # show_interactive_2d_seedspace(fn.linear_model, 1000, 500, 20)
