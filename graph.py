@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import SimpleModel
 from matplotlib.widgets import Slider, Button
-from frymodel import FryModel, fry_model
+from frymodel import FryModel
 
 
 def ordinary_plot_over_time(model: SimpleModel):
@@ -92,9 +92,7 @@ def show_interactive_2d_seedspace(model, juviniles_max, adults_max):
     plt.show()
 
 
-def show_interactive_3d_seedspace(
-    model: FryModel, fry_max, juviniles_max, adults_max
-):
+def show_interactive_3d_seedspace(model: FryModel, fry_max, juviniles_max, adults_max):
     parameter_sliders = {}
 
     for i, key in enumerate(model.__dict__):
@@ -179,20 +177,30 @@ def sensitivity_run(
 ):
     list_adults = []
     for model in models:
+        model.iterations = iterations
         _, adults = model.run(initial)
         plt.plot(
             range(iterations),
             list(adults),
-            label=model.description() + " Adult Population",
+            label=model.description(),
         )
         list_adults.append(adults)
 
     plt.xlabel("Time step")
-    plt.ylabel("Population")
+    plt.ylabel("Adult Population")
     plt.legend()
     plt.show()
 
 
-if __name__ == "__main__":
-    show_interactive_3d_seedspace(fry_model, 800, 100, 400)
-    # show_interactive_2d_seedspace(fn.linear_model, 1000, 500, 20)
+def ordinary3d_plot_over_time(model: FryModel):
+    # Run the model for 20 time steps starting with 10 juveniles and 20 adults
+    fry, juveniles, adults = model.run(FryModel.State(1, 1, 1))
+
+    plt.plot(range(model.iterations), list(fry), label="Fry")
+    plt.plot(range(model.iterations), list(juveniles), label="Juveniles")
+    plt.plot(range(model.iterations), list(adults), label="Adults")
+    plt.xlabel("Time step")
+    plt.ylabel("Population")
+    plt.legend()
+    plt.title(model.description())
+    plt.show()

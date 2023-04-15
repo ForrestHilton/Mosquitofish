@@ -1,11 +1,11 @@
 import numpy as np
-import functions as fn
+from cannibalism_models import Ricker, SimpleModel
 
 """A similar class to SimpleModel except that a competition
 term is included. Ricker cannibalism is used."""
 
 
-class CompetitionModel(fn.Ricker):
+class CompetitionModel(Ricker):
     def __init__(
         self,
         cm_competion_param=1000,
@@ -14,8 +14,8 @@ class CompetitionModel(fn.Ricker):
         self.competition_param = cm_competion_param
 
     def run_one_time_step(
-        self, state: "fn.SimpleModel.State"
-    ) -> "fn.SimpleModel.State":
+        self, state: "SimpleModel.State"
+    ) -> "SimpleModel.State":
         "takes a State object and returns a new State object representing the next time step"
         juveniles, adults = state.juveniles, state.adults
 
@@ -31,7 +31,3 @@ class CompetitionModel(fn.Ricker):
         )
 
         return CompetitionModel.State(new_juveniles, new_adults)
-
-
-# Object for use in main -- need to import functions for
-competition_model = CompetitionModel()

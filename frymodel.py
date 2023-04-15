@@ -1,10 +1,9 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import functions
+from cannibalism_models import Ricker
 import math
 
 
-class FryModel(functions.Ricker):
+class FryModel(Ricker):
     def __init__(self):
         super().__init__()
         # adjustments for halving time step
@@ -66,20 +65,3 @@ class FryModel(functions.Ricker):
             adults_array = np.append(adults_array, current_state.adults)
 
         return fry_array, juveniles_array, adults_array
-
-
-def ordinary3d_plot_over_time(model: FryModel):
-    # Run the model for 20 time steps starting with 10 juveniles and 20 adults
-    fry, juveniles, adults = model.run(FryModel.State(100, 100, 100))
-
-    plt.plot(range(model.iterations), list(fry), label="Fry")
-    plt.plot(range(model.iterations), list(juveniles), label="Juveniles")
-    plt.plot(range(model.iterations), list(adults), label="Adults")
-    plt.xlabel("Time step")
-    plt.ylabel("Population")
-    plt.legend()
-    plt.title(model.description())
-    plt.show()
-
-
-fry_model = FryModel()

@@ -1,9 +1,3 @@
-"""
-This file contains all mathematical functions (for stocks, flows, converters)
-included in all of the possible models. This makes it easier to make variants
-of models because we can just import this file and call each of the functions
-in the models when we need them rather than having to redefine them each time
-"""
 from model import SimpleModel
 
 import numpy as np
@@ -11,24 +5,13 @@ import numpy as np
 
 # Different cannibalism models
 
-# IMPORTANT: I think we have been misinterpreting the cannibalism
-# multipliers. Right now, we are interpreting them as the raw
-# number of mosquitofish juveniles who are dying before they
-# reach the next generation. I think the correct interpretation
+# IMPORTANT: The correct interpretation of the cannibalism function
 # is that the multiplier is a term we multiply the juvenile
-# probability survival with. In model.py, this would correspond
-# to changing:
-# maturations = juveniles * self.juvenile_survive_probability - cannibalism
-# to:
-# maturations = juveniles * self.juvenile_survive_probability * cannibalism
-# and cannibalism should probably be renamed cannibalism multiplier.
+# probability survival with.
+
 # These multipliers decrease as the number of adults increases, and thus
 # it makes sense that the number of maturations would decrease
-# with increasing number of adults, but the way we have it set up
-# now, the maturations are increasing with the number of adults.
-# I have not changed the implementation in model.py yet, I'm just
-# putting in new canibalism models; we can change are implementation
-# when we discuss it in class if necessary.
+# with increasing number of adults.
 
 
 class BevertonHolt(SimpleModel):
@@ -41,9 +24,6 @@ class BevertonHolt(SimpleModel):
 
     def cannibalism_multiplier(self, state: SimpleModel.State):
         return 1 / (1 + self.strength_can_bev_holt * state.adults)
-
-
-bev_holt_model = BevertonHolt()
 
 
 class Allee(SimpleModel):
@@ -64,12 +44,6 @@ class Allee(SimpleModel):
         )
 
 
-allee_model = Allee()
-
-
-# What we thought was the Ricker cannibalism we implemented
-# as default cannibalsim in SimpleModel, but I think this is
-# the correct implementation
 class Ricker(SimpleModel):
     def __init__(
         self,
@@ -82,9 +56,6 @@ class Ricker(SimpleModel):
         return np.exp(-self.strength_cannibalism * state.adults)
 
 
-ricker_model = Ricker()
-
-
 class Linear(SimpleModel):
     def __init__(
         self,
@@ -95,6 +66,3 @@ class Linear(SimpleModel):
 
     def cannibalism_multiplier(self, state: SimpleModel.State):
         return np.maximum(1 - state.adults / self.big_m_param, 0)
-
-
-linear_model = Linear()

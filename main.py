@@ -1,22 +1,31 @@
-import functions as fn
-import competition_model as cm
-import graph
+from cannibalism_models import BevertonHolt, Allee, Ricker, Linear
+from competition_model import CompetitionModel
+from frymodel import FryModel
+from graph import (
+    sensitivity_run,
+    show_interactive_2d_seedspace,
+    show_interactive_3d_seedspace,
+    ordinary_plot_over_time,
+    ordinary3d_plot_over_time,
+)
 
+# in a terminal run "from main import *" and you can execute any of this
 if __name__ == "__main__":
-    graph.sensitivity_run(
-        [fn.bev_holt_model, fn.allee_model, fn.ricker_model, fn.linear_model]
-    )
 
-    # Beverton Holt
-    graph.ordinary_plot_over_time(fn.bev_holt_model, 20)
+    # different cannibalism models
+    ordinary_plot_over_time(BevertonHolt())
+    show_interactive_2d_seedspace(BevertonHolt(), 2000, 400)
+    ordinary_plot_over_time(Allee())
+    show_interactive_2d_seedspace(Allee(), 400, 100)
+    ordinary_plot_over_time(Ricker())
+    show_interactive_2d_seedspace(Ricker(), 400, 100)
+    ordinary_plot_over_time(Linear())
+    show_interactive_2d_seedspace(Linear(), 500, 200)
 
-    # Allee
-    graph.ordinary_plot_over_time(fn.allee_model, 20)
+    # FryModel
+    ordinary3d_plot_over_time(FryModel())
+    show_interactive_3d_seedspace(FryModel(), 100, 10, 100)
 
-    # Ricker
-    graph.ordinary_plot_over_time(fn.ricker_model, 20)
-
-    # Linear
-    graph.ordinary_plot_over_time(fn.linear_model, 20)
-
-    graph.ordinary_plot_over_time(cm.competition_model,20)
+    # competition
+    sensitivity_run([CompetitionModel(), Ricker()])
+    ordinary_plot_over_time(Linear())
