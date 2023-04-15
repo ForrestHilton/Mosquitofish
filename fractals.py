@@ -6,7 +6,7 @@ The black pixels are the  that stay bounded or
 import numpy as np
 import matplotlib.pyplot as plt
 from model import SimpleModel
-from functions import model
+import functions as fn
 
 
 def seed_space(
@@ -18,17 +18,17 @@ def seed_space(
     y0 = bounds[2]
     y1 = bounds[3]
     x, y = np.meshgrid(
-        np.linspace(x0, x1, pixels_wide), np.linspace(y0, y1, pixels_wide) * 1j
+        np.linspace(x0, x1, pixels_wide), np.linspace(y0, y1, pixels_wide)
     )
     state = SimpleModel.State(juveniles=x, adults=y)
     # F keeps track of which grid points are bounded
     # even after many iterations
     F = np.zeros([pixels_wide, pixels_wide])
     # Iterate through the operation
-    for j in range(iterations):
-        state = model.run_one_time_step(state)
-        index = state.juveniles + state.adults < np.inf
-        F[index] = F[index] + 1  # count how many iterations it takes to get to inf
+    next_state = model.run_one_time_step(state)
+    # F = F + next_state.adults - state.adults
+    index = next_state.juveniles + next_state.adults > state.juveniles + state.adults
+    F[index] = F[index] + 1  # count how many iterations it takes to get to inf
     return np.linspace(x0, x1, pixels_wide), np.linspace(y0, y1, pixels_wide), F
 
 
@@ -41,15 +41,15 @@ def graph_seed_space(model: SimpleModel, juviniles_max, adults_max):
     )
     fig, ax = plt.subplots(figsize=(10, 10))
     im = ax.pcolormesh(x, y, F, cmap="binary")
-    ax.set_xlabel('Juveniles')
-    ax.set_ylabel('Adults')
+    ax.set_xlabel("Juveniles")
+    ax.set_ylabel("Adults")
     # ax.set_title('Number of iterations without reaching infinity for initial value')
     fig.colorbar(im, ax=ax)
     plt.show()
 
 
-model.strength_cannibalism = 5
+model = fn.linear_model
 # model = SimpleModel(0.005, 1, 1, 1)
 # graph_seed_space(model, 100, 100)
 # model = SimpleModel(1, 1, 1, 1)
-graph_seed_space(model, 100, 100)
+graph_seed_space(model, 1000, 200)
