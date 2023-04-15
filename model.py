@@ -1,6 +1,8 @@
 import numpy as np
 import math
 
+# except as otherwise noted, all units are in Fish or unit less
+
 
 class SimpleModel:
     class State:
@@ -81,15 +83,13 @@ class SimpleModel:
         # Number of new juvelines each year is the number that
         # are born each year. Cannot have less than 0 juveniles,
         # hence numpy.maximum is used.
-        new_juveniles = np.maximum(births, 0)
+        new_juveniles = births
         # Adults have a particular survival probability, so the
         # number of adults that keep surviving from the last time
         # step is adults * adult survival probability, and there
         # are also new adults from juvelines maturing. Also
         # can't have less than 0 adults.
-        new_adults = np.maximum(
-            adults * self.adult_survival_probability + maturations, 0
-        )
+        new_adults = adults * self.adult_survival_probability + maturations
 
         return SimpleModel.State(new_juveniles, new_adults)
 

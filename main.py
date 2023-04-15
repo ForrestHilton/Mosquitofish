@@ -1,3 +1,4 @@
+from model import SimpleModel
 from cannibalism_models import BevertonHolt, Allee, Ricker, Linear
 from competition_model import CompetitionModel
 from frymodel import FryModel
@@ -11,6 +12,8 @@ from graph import (
 
 # in a terminal run "from main import *" and you can execute any of this
 if __name__ == "__main__":
+    ordinary_plot_over_time(SimpleModel())
+    show_interactive_2d_seedspace(SimpleModel(), 2000, 2000)
 
     # different cannibalism models
     ordinary_plot_over_time(BevertonHolt())
@@ -27,5 +30,6 @@ if __name__ == "__main__":
     show_interactive_3d_seedspace(FryModel(), 100, 10, 100)
 
     # competition
+    show_interactive_2d_seedspace(CompetitionModel(), 400, 100)
     sensitivity_run([CompetitionModel(), Ricker()])
-    ordinary_plot_over_time(Linear())
+    ordinary_plot_over_time(CompetitionModel())
