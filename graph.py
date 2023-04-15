@@ -22,65 +22,75 @@ def ordinary_plot_over_time(model: SimpleModel, steps: int):
 
 
 def show_interactive_2d_seedspace(model, juviniles_max, adults_max, iterations: int):
+    parameter_sliders = {}
+
+    for i, key in enumerate(model.__dict__):
+        val = model.__dict__[key]
+        parameter_sliders[key] = Slider(
+            plt.axes([0.35, 0.95 - i * 0.05, 0.55, 0.03]), key, 0.0, val * 5, val
+        )
+
     def run(x: float, y: float) -> tuple[np.ndarray, np.ndarray]:
         return model.run(SimpleModel.State(x, y), iterations)
 
+    resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
+    button = Button(resetax, "Reset", color="gold", hovercolor="skyblue")
     # Generate 20 points using the run function
-    juviniles_x, audults_y = run(1, 1)
 
-    # Initialize the plot
-    fig, ax = plt.subplots()
-    (line,) = ax.plot(juviniles_x, audults_y, "-o")
-    arrow = ax.quiver(
-        juviniles_x[:-1],
-        audults_y[:-1],
-        juviniles_x[1:] - juviniles_x[:-1],
-        audults_y[1:] - audults_y[:-1],
-        scale_units="xy",
-        angles="xy",
-        scale=1,
-    )
-    # Set the limits of the plot
-    ax.set_xlim(0, juviniles_max)
-    ax.set_ylim(0, adults_max)
-    ax.set_title(model.description())
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)  # Initialize the plot
+    initial = SimpleModel.State(1, 1)
+
+    def draw_figure():
+        ax.clear()
+        juviniles_x, audults_y = model.run(initial, iterations)
+        ax.plot(juviniles_x, audults_y, "-o")
+        ax.quiver(
+            juviniles_x[:-1],
+            audults_y[:-1],
+            juviniles_x[1:] - juviniles_x[:-1],
+            audults_y[1:] - audults_y[:-1],
+            scale_units="xy",
+            angles="xy",
+            scale=1,
+        )
+        # Set the limits of the plot
+        ax.set_xlim(0, juviniles_max)
+        ax.set_ylim(0, adults_max)
+        ax.set_title(model.description())
+        ax.set_xlabel("Juveniles")
+        ax.set_ylabel("Adults")
+        fig.canvas.draw()
 
     # Define the function to update the plot based on the new first point
-    def update_plot(event):
-        if event.inaxes == ax:
-            x, y = run(event.xdata, event.ydata)
-            line.set_data(x, y)
-            arrow.set_offsets(np.c_[x[:-1], y[:-1]])
-            arrow.set_UVC(x[1:] - x[:-1], y[1:] - y[:-1])
-            fig.canvas.draw()
+    def respond_initial_changed(event):
+        if event.inaxes == ax and fig.canvas.toolbar.mode == "":
+            initial.juveniles = event.xdata
+            initial.adults = event.ydata
+            draw_figure()
 
     # Connect the function to the mouse click event
-    cid = fig.canvas.mpl_connect("button_press_event", update_plot)
+    fig.canvas.mpl_connect("button_press_event", respond_initial_changed)
 
-    # Set the title and axis labels
-    # ax.set_title('')
-    ax.set_xlabel("Juveniles")
-    ax.set_ylabel("Adults")
+    draw_figure()
 
-    plt.show()
+    def respond_param_changed(_):
+        for key in model.__dict__:
+            model.__dict__[key] = parameter_sliders[key].val
+        draw_figure()
 
+    for slider in list(parameter_sliders.values()):
+        slider.on_changed(respond_param_changed)
 
-def sensitivity_run(
-    models: List[SimpleModel], initial=SimpleModel.State(20, 20), iterations=40
-):
-    list_adults = []
-    for model in models:
-        _, adults = model.run(initial, iterations)
-        plt.plot(
-            range(iterations),
-            list(adults),
-            label=model.description() + " Adult Population",
-        )
-        list_adults.append(adults)
+    # Create a function resetSlider to set slider to
+    # initial values when Reset button is clicked
 
-    plt.xlabel("Time step")
-    plt.ylabel("Population")
-    plt.legend()
+    def resetSlider(event):
+        for slider in list(parameter_sliders.values()):
+            slider.reset()
+
+    # Call resetSlider function when clicked on reset button
+    button.on_clicked(resetSlider)
     plt.show()
 
 
@@ -143,14 +153,22 @@ def show_interactive_3d_seedspace(
 
     update(None)
 
-    for slider in list(parameter_sliders.values()) + [fry_slider, juvinililes_slider, adults_slider]:
+    for slider in list(parameter_sliders.values()) + [
+        fry_slider,
+        juvinililes_slider,
+        adults_slider,
+    ]:
         slider.on_changed(update)
 
     # Create a function resetSlider to set slider to
     # initial values when Reset button is clicked
 
     def resetSlider(event):
-        for slider in list(parameter_sliders.values()) + [fry_slider, juvinililes_slider, adults_slider]:
+        for slider in list(parameter_sliders.values()) + [
+            fry_slider,
+            juvinililes_slider,
+            adults_slider,
+        ]:
             slider.reset()
 
     # Call resetSlider function when clicked on reset button
@@ -158,6 +176,25 @@ def show_interactive_3d_seedspace(
     plt.show()
 
 
+def sensitivity_run(
+    models: List[SimpleModel], initial=SimpleModel.State(20, 20), iterations=40
+):
+    list_adults = []
+    for model in models:
+        _, adults = model.run(initial, iterations)
+        plt.plot(
+            range(iterations),
+            list(adults),
+            label=model.description() + " Adult Population",
+        )
+        list_adults.append(adults)
+
+    plt.xlabel("Time step")
+    plt.ylabel("Population")
+    plt.legend()
+    plt.show()
+
+
 if __name__ == "__main__":
-    show_interactive_3d_seedspace(fry_model, 800, 100, 400, 20)
-    # show_interactive_2d_seedspace(fn.linear_model, 1000, 500, 20)
+    # show_interactive_3d_seedspace(fry_model, 800, 100, 400, 20)
+    show_interactive_2d_seedspace(fn.linear_model, 1000, 500, 20)
