@@ -1,3 +1,4 @@
+from model import SimpleModel
 from cannibalism_models import BevertonHolt, Allee, Ricker, Linear
 from competition_model import CompetitionModel
 from frymodel import FryModel
@@ -11,6 +12,11 @@ from graph import (
 
 # in a terminal run "from main import *" and you can execute any of this
 if __name__ == "__main__":
+    # simple model. Includes an ordinary plot and a 2-D
+    # interactive plot. See comments below about the 
+    # different cannibalism models for more details. 
+    ordinary_plot_over_time(SimpleModel())
+    show_interactive_2d_seedspace(SimpleModel(), 2000, 2000)
 
     # different cannibalism models. Ordinary plots show the 
     # number of adults and the number of juveniles over time 
@@ -46,10 +52,7 @@ if __name__ == "__main__":
     ordinary3d_plot_over_time(FryModel())
     show_interactive_3d_seedspace(FryModel(), 100, 10, 100)
 
-    # competition. The sensitivity run compares the number
-    # of adults present over time in the competition model
-    # to the standard ricker cannibalism model. A linear 
-    # cannibalism model is shown in an additional plot 
-    # for additional comparison purposes. 
+    # competition
+    show_interactive_2d_seedspace(CompetitionModel(), 400, 100)
     sensitivity_run([CompetitionModel(), Ricker()])
-    ordinary_plot_over_time(Linear())
+    ordinary_plot_over_time(CompetitionModel())
