@@ -15,14 +15,14 @@ import numpy as np
 # justified in the population dynamics literature.
 
 # These cannibalism models inherit from the SimpleModel class and are
-# otherwise very similar. The cannibalism_multiplier function is 
-# overrriden so that each model can implement its own equation
+# otherwise very similar. The cannibalism_multiplier function is
+# overridden so that each model can implement its own equation
 # indirectly used to calculate deaths from cannibalism. They require
 # parameters corresponding to how strong the cannibalism is, and in
-# general as this parameter increases the number of deaths from 
+# general as this parameter increases the number of deaths from
 # cannibalism increases and the corresponding number of maturations
-# is smaller. However, some models have different or additional 
-# parameters which are documented below.  
+# is smaller. However, some models have different or additional
+# parameters which are documented below.
 
 
 class BevertonHolt(SimpleModel):
@@ -73,7 +73,7 @@ class Linear(SimpleModel):
         # referred to as M, and as M increases, the number of
         # deaths from cannibalism actually decreases. Thus,
         # this variable is referreed to as a parameter rather
-        # than a strength.  
+        # than a strength.
         self.big_m_param = 100
 
     def cannibalism_multiplier(self, state: SimpleModel.State):

@@ -12,22 +12,20 @@ class CompetitionModel(Ricker):
     ) -> None:
         super().__init__()
         # The parameter was arbitrarily chosen to
-        # be a large number and this choice of 
+        # be a large number and this choice of
         # constant appears to have a noticeable
         # effect on the population. It is referred
         # to as a "parameter" rather than "strength"
         # because a larger value actually implies
-        # less competition. 
-        self.competition_param = 1000 
+        # less competition.
+        self.competition_param = 1000
 
-    def run_one_time_step(
-        self, state: "SimpleModel.State"
-    ) -> "SimpleModel.State":
+    def run_one_time_step(self, state: "SimpleModel.State") -> "SimpleModel.State":
         "takes a State object and returns a new State object representing the next time step"
         # This method is very similar to the corresponding
         # method in the parent class (see that class for
         # more details). The only change is incorporating
-        # extra adult deaths from competition. 
+        # extra adult deaths from competition.
         juveniles, adults = state.juveniles, state.adults
 
         births = self.fecundity * adults
@@ -36,9 +34,9 @@ class CompetitionModel(Ricker):
         # Here we're calculating the number adults that died
         # from competition, presumably from starving to death due to
         # limited resources and some fish getting acess to food but
-        # others not. The number of deaths is proportional to the 
+        # others not. The number of deaths is proportional to the
         # number of adults squared, inspired by the simple logistic
-        # population model: dP/dt = kP(1-P/Pmax). Expanding this 
+        # population model: dP/dt = kP(1-P/Pmax). Expanding this
         # expression yields dP/dt = kP - kP^2/Pmax; the births term
         # is represented by kP, and the competition term, which we're
         # interested in, is represented by - kP^2/Pmax. For the sake
@@ -47,8 +45,8 @@ class CompetitionModel(Ricker):
 
         new_juveniles = np.maximum(births, 0)
         # Here, when calculating the new number of adults, we have
-        # to subtract deaths from competition from the figure we 
-        # would have obtained using the parent class method. 
+        # to subtract deaths from competition from the figure we
+        # would have obtained using the parent class method.
         new_adults = np.maximum(
             adults * self.adult_survival_probability + maturations - competition_deaths,
             0,
