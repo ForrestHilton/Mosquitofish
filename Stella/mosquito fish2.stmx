@@ -138,7 +138,7 @@
 				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
 				<isee:financial_table color="black" background="#E0E0E0" text_align="right" font_size="12pt" hide_border="false" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
 			</style>
-			<view isee:show_pages="false" background="white" page_width="1056" page_height="816" isee:page_cols="2" isee:page_rows="2" isee:scroll_x="260" zoom="80" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+			<view isee:show_pages="false" background="white" page_width="1097" page_height="767" isee:page_cols="2" isee:page_rows="2" zoom="300" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
 				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
 					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
 						<shape type="rectangle" width="45" height="35"/>
@@ -177,58 +177,58 @@
 					</graph>
 					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="summed" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
 				</style>
-				<stock x="236" y="189" width="242" height="172" name="Juvenile Fish"/>
-				<stock x="545.5" y="202.5" width="291" height="162" name="Adult Fish"/>
-				<flow x="505.75" y="269" name="Maturations">
+				<stock x="89.8333" y="105.837" width="71.5455" height="77.9091" name="Juvenile Fish"/>
+				<stock x="238.246" y="111.913" width="98.4848" height="90.6061" name="Adult Fish"/>
+				<flow x="184.812" y="115.905" width="18" height="18" name="Maturations">
 					<pts>
-						<pt x="478" y="269"/>
-						<pt x="545.5" y="269"/>
+						<pt x="161.379" y="124.905"/>
+						<pt x="238.246" y="124.905"/>
 					</pts>
 				</flow>
-				<flow x="426.25" y="455" name="cannibalism death">
+				<flow x="111" y="211.569" width="18" height="18" name="cannibalism death">
 					<pts>
-						<pt x="396.5" y="361"/>
-						<pt x="396.5" y="455"/>
-						<pt x="480" y="455"/>
+						<pt x="94.3333" y="183.746"/>
+						<pt x="94.3333" y="220.569"/>
+						<pt x="169.667" y="220.569"/>
 					</pts>
 				</flow>
-				<flow x="900.75" y="266" name="Natural death">
+				<flow x="369.58" y="174.286" name="Natural death">
 					<pts>
-						<pt x="836.5" y="266"/>
-						<pt x="989" y="266"/>
+						<pt x="336.731" y="174.286"/>
+						<pt x="426.429" y="174.286"/>
 					</pts>
 				</flow>
-				<flow x="169.5" y="245" name="Births">
+				<flow x="49.4167" y="137" width="18" height="18" name="Births">
 					<pts>
-						<pt x="103" y="245"/>
-						<pt x="236" y="245"/>
+						<pt x="27" y="146"/>
+						<pt x="89.8333" y="146"/>
 					</pts>
 				</flow>
-				<connector uid="4" angle="354.19">
+				<connector uid="4" angle="7.98107">
 					<from>Adult_Fish</from>
 					<to>Natural_death</to>
 				</connector>
-				<connector uid="6" angle="311.074">
+				<connector uid="6" angle="265.819">
 					<from>Juvenile_Fish</from>
 					<to>cannibalism_death</to>
 				</connector>
-				<aux x="204" y="49" name="chance for a female to produce"/>
-				<aux x="548" y="38" name="population % is Female"/>
-				<connector uid="10" angle="161.565">
+				<aux x="193.812" y="47.7917" name="chance for a female to produce"/>
+				<aux x="317.155" y="65.7917" name="population % is Female"/>
+				<connector uid="10" angle="171.697">
 					<from>&quot;population_%_is_Female&quot;</from>
 					<to>chance_for_a_female_to_produce</to>
 				</connector>
-				<connector uid="11" angle="106.164">
+				<connector uid="11" angle="72.022">
 					<from>Adult_Fish</from>
 					<to>&quot;population_%_is_Female&quot;</to>
 				</connector>
-				<aux x="910" y="155" name="chance for death"/>
-				<connector uid="12" angle="345.174">
+				<aux x="394.024" y="120.572" name="chance for death"/>
+				<connector uid="12" angle="245.531">
 					<from>chance_for_death</from>
 					<to>Natural_death</to>
 				</connector>
-				<aux x="559.5" y="399" name="Cannibalism multiplier"/>
-				<stacked_container uid="16" x="938" y="500">
+				<aux x="326.766" y="238.569" name="Cannibalism multiplier"/>
+				<stacked_container uid="16" x="935.5" y="616">
 					<graph width="350" height="250" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
 						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
 							<entity name="Adult_Fish"/>
@@ -242,45 +242,41 @@
 						</plot>
 					</graph>
 				</stacked_container>
-				<aux x="678" y="399" name="Cannibalism Strength"/>
-				<connector uid="20" angle="151.157">
+				<aux x="412.024" y="223.852" name="Cannibalism Strength"/>
+				<connector uid="20" angle="189.794">
 					<from>Cannibalism_Strength</from>
 					<to>Cannibalism_multiplier</to>
 				</connector>
-				<aux x="487.75" y="387" name="Maturation Number"/>
-				<connector uid="23" angle="230.43">
+				<aux x="216.494" y="249.236" name="Maturation Number"/>
+				<connector uid="23" angle="163.454">
 					<from>Maturation_Number</from>
 					<to>cannibalism_death</to>
 				</connector>
-				<connector uid="24" angle="57.1443">
+				<connector uid="24" angle="100.339">
 					<from>Maturation_Number</from>
 					<to>Maturations</to>
 				</connector>
-				<connector uid="25" angle="320.407">
+				<connector uid="25" angle="311.03">
 					<from>Juvenile_Fish</from>
 					<to>Maturation_Number</to>
 				</connector>
-				<connector uid="26" angle="170.505">
-					<from>Cannibalism_multiplier</from>
-					<to>Maturation_Number</to>
-				</connector>
-				<aux x="130" y="137" name="Average brood size"/>
-				<connector uid="30" angle="292.38">
+				<aux x="49.4167" y="49.125" width="18" height="18" name="Average brood size"/>
+				<connector uid="30" angle="270">
 					<from>Average_brood_size</from>
 					<to>Births</to>
 				</connector>
-				<connector uid="31" angle="226.637">
+				<connector uid="31" angle="184.364">
 					<from>chance_for_a_female_to_produce</from>
 					<to>Average_brood_size</to>
 				</connector>
-				<stacked_container uid="32" x="203" y="553">
+				<stacked_container uid="32" x="199.875" y="616">
 					<graph width="350" height="250" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
 						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
 							<entity name="Births"/>
 						</plot>
 					</graph>
 				</stacked_container>
-				<stacked_container uid="33" x="938" y="742">
+				<stacked_container uid="33" x="932.375" y="883.875">
 					<graph width="350" height="250" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
 						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
 							<entity name="Maturations"/>
@@ -304,6 +300,10 @@
 						</item>
 					</table>
 				</stacked_container>
+				<connector uid="26" angle="185.525">
+					<from>Cannibalism_multiplier</from>
+					<to>Maturation_Number</to>
+				</connector>
 			</view>
 		</views>
 	</model>
