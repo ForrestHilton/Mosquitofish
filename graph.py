@@ -7,7 +7,6 @@ from frymodel import FryModel
 
 
 def ordinary_plot_over_time(model: SimpleModel):
-    # Run the model for 20 time steps starting with 10 juveniles and 20 adults
     juveniles, adults = model.run(SimpleModel.State(100, 100))
 
     plt.plot(range(model.iterations), list(juveniles), label="Juveniles")
@@ -33,7 +32,6 @@ def show_interactive_2d_seedspace(model, juviniles_max, adults_max):
 
     resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
     button = Button(resetax, "Reset", color="gold", hovercolor="skyblue")
-    # Generate 20 points using the run function
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)  # Initialize the plot
@@ -116,7 +114,6 @@ def show_interactive_3d_seedspace(model: FryModel, fry_max, juviniles_max, adult
     fig = plt.figure()
     ax = fig.add_subplot(111, projection="3d")
     # Create function to be called when slider value is changed
-    # Set the limits of the plot
 
     def update(val):
         ax.clear()
@@ -137,6 +134,7 @@ def show_interactive_3d_seedspace(model: FryModel, fry_max, juviniles_max, adult
             dz = adults_z[i + 1] - adults_z[i]
             ax.quiver(fry_x[i], juviniles_y[i], adults_z[i], dx, dy, dz, color="black")
 
+        # Set the limits of the plot
         ax.set_xlim(0, fry_max)
         ax.set_ylim(0, juviniles_max)
         ax.set_zlim(0, adults_max)
@@ -193,7 +191,6 @@ def sensitivity_run(
 
 
 def ordinary3d_plot_over_time(model: FryModel):
-    # Run the model for 20 time steps starting with 10 juveniles and 20 adults
     fry, juveniles, adults = model.run(FryModel.State(1, 1, 1))
 
     plt.plot(range(model.iterations), list(fry), label="Fry")
