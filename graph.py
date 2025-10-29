@@ -1,203 +1,146 @@
-from typing import List
+# graph.py
+from __future__ import annotations
+from typing import Callable, Optional, Tuple, List, Dict
+import math
 import numpy as np
 import matplotlib.pyplot as plt
-from model import SimpleModel
-from matplotlib.widgets import Slider, Button
-from frymodel import FryModel
+
+from .model import SimpleModel, Environment
+from .frymodel import FryModel
+
+# Optional presets/utilities if available:
+try:
+    from .environment_profiles import TankShape, FeedingSchedule
+except Exception:
+    TankShape = None
+    FeedingSchedule = None
 
 
-def ordinary_plot_over_time(model: SimpleModel):
-    juveniles, adults = model.run(SimpleModel.State(100, 100))
+def _ensure_axes():
+    fig, ax = plt.subplots(1, 1, figsize=(8, 4.5))
+    return fig, ax
 
-    plt.plot(range(model.iterations), list(juveniles), label="Juveniles")
-    plt.plot(range(model.iterations), list(adults), label="Adults")
-    plt.xlabel("Time step")
-    plt.ylabel("Population")
-    plt.legend()
-    plt.title(model.description())
+
+def plot_over_time(model: FryModel,
+                   init: Tuple[float, float, float, float] = (10.0, 2.0, 1.0, 1.0),
+                   title: Optional[str] = None) -> None:
+    """Run model.run(...) and plot Fry, Juveniles, AdultF, AdultM."""
+    F, J, AF, AM = model.run(SimpleModel.State(*init))
+    t = np.arange(len(F))
+    fig, ax = _ensure_axes()
+    ax.plot(t, F, label="Fry")
+    ax.plot(t, J, label="Juveniles")
+    ax.plot(t, AF, label="Adult ♀")
+    ax.plot(t, AM, label="Adult ♂")
+    ax.set_xlabel("Step")
+    ax.set_ylabel("Abundance")
+    ax.set_title(title or model.__class__.__name__)
+    ax.legend()
+    fig.tight_layout()
     plt.show()
 
 
-def show_interactive_2d_seedspace(model, juviniles_max, adults_max):
-    parameter_sliders = {}
+# -----------------------------
+# Temporal environment support
+# -----------------------------
+EnvUpdater = Callable[[int, Environment], None]
 
-    for i, key in enumerate(model.__dict__):
-        val = model.__dict__[key]
-        parameter_sliders[key] = Slider(
-            plt.axes([0.35, 0.95 - i * 0.05, 0.55, 0.03]), key, 0.0, val * 5, val
-        )
+def simulate_with_env_profile(model: FryModel,
+                              init: Tuple[float, float, float, float],
+                              steps: int,
+                              env_updater: Optional[EnvUpdater] = None):
+    """
+    Manual stepping loop so we can change Environment each step.
+    Returns arrays (F, J, AF, AM) matching model.run() shape.
+    """
+    s = SimpleModel.State(*map(float, init))
+    F, J, AF, AM = [s.fry], [s.juveniles], [s.adult_female], [s.adult_male]
 
-    def run(x: float, y: float) -> tuple[np.ndarray, np.ndarray]:
-        return model.run(SimpleModel.State(x, y))
+    # keep a step index for feeding schedules, as in model.run()
+    model.provenance.setdefault("step_index", 0)
 
-    resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
-    button = Button(resetax, "Reset", color="gold", hovercolor="skyblue")
+    for k in range(steps):
+        if env_updater is not None:
+            env_updater(k, model.env)  # mutate in place
 
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)  # Initialize the plot
-    initial = SimpleModel.State(1, 1)
+        s = model.step(s)
+        F.append(max(0.0, float(s.fry)))
+        J.append(max(0.0, float(s.juveniles)))
+        AF.append(max(0.0, float(s.adult_female)))
+        AM.append(max(0.0, float(s.adult_male)))
+        model.provenance["step_index"] = int(model.provenance["step_index"]) + 1
 
-    def draw_figure():
-        ax.clear()
-        juviniles_x, audults_y = model.run(initial)
-        ax.plot(juviniles_x, audults_y, "-o")
-        ax.quiver(
-            juviniles_x[:-1],
-            audults_y[:-1],
-            juviniles_x[1:] - juviniles_x[:-1],
-            audults_y[1:] - audults_y[:-1],
-            scale_units="xy",
-            angles="xy",
-            scale=1,
-        )
-        # Set the limits of the plot
-        ax.set_xlim(0, juviniles_max)
-        ax.set_ylim(0, adults_max)
-        ax.set_title(model.description())
-        ax.set_xlabel("Juveniles")
-        ax.set_ylabel("Adults")
-        fig.canvas.draw()
-
-    # Define the function to update the plot based on the new first point
-    def respond_initial_changed(event):
-        if event.inaxes == ax and fig.canvas.toolbar.mode == "":
-            initial.juveniles = event.xdata
-            initial.adults = event.ydata
-            draw_figure()
-
-    # Connect the function to the mouse click event
-    fig.canvas.mpl_connect("button_press_event", respond_initial_changed)
-
-    draw_figure()
-
-    def respond_param_changed(_):
-        for key in model.__dict__:
-            model.__dict__[key] = parameter_sliders[key].val
-        draw_figure()
-
-    for slider in list(parameter_sliders.values()):
-        slider.on_changed(respond_param_changed)
-
-    # Create a function resetSlider to set slider to
-    # initial values when Reset button is clicked
-
-    def resetSlider(event):
-        for slider in list(parameter_sliders.values()):
-            slider.reset()
-
-    # Call resetSlider function when clicked on reset button
-    button.on_clicked(resetSlider)
-    plt.show()
+    return np.array(F), np.array(J), np.array(AF), np.array(AM)
 
 
-def show_interactive_3d_seedspace(model: FryModel, fry_max, juviniles_max, adults_max):
-    parameter_sliders = {}
-
-    for i, key in enumerate(model.__dict__):
-        val = model.__dict__[key]
-        parameter_sliders[key] = Slider(
-            plt.axes([0.35, 0.95 - i * 0.05, 0.55, 0.03]), key, 0.0, val * 5, val
-        )
-
-    fry_slider = Slider(plt.axes([0.25, 0.2, 0.65, 0.03]), "Fry", 0.0, fry_max, 1)
-    juvinililes_slider = Slider(
-        plt.axes([0.25, 0.15, 0.65, 0.03]), "Juviniles", 0.0, juviniles_max, 1
-    )
-    adults_slider = Slider(
-        plt.axes([0.25, 0.1, 0.65, 0.03]), "Adults", 0.0, adults_max, 1
-    )
-
-    # Create axes for reset button and create button
-    resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
-    button = Button(resetax, "Reset", color="gold", hovercolor="skyblue")
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection="3d")
-    # Create function to be called when slider value is changed
-
-    def update(val):
-        ax.clear()
-        initial = FryModel.State(
-            fry_slider.val, juvinililes_slider.val, adults_slider.val
-        )
-        for key in model.__dict__:
-            model.__dict__[key] = parameter_sliders[key].val
-
-        fry_x, juviniles_y, adults_z = model.run(initial)
-        ax.scatter(fry_x, juviniles_y, adults_z, c="b", marker="o")
-
-        # Connect consecutive points with lines
-        # Add arrows to indicate direction
-        for i in range(len(fry_x) - 1):
-            dx = fry_x[i + 1] - fry_x[i]
-            dy = juviniles_y[i + 1] - juviniles_y[i]
-            dz = adults_z[i + 1] - adults_z[i]
-            ax.quiver(fry_x[i], juviniles_y[i], adults_z[i], dx, dy, dz, color="black")
-
-        # Set the limits of the plot
-        ax.set_xlim(0, fry_max)
-        ax.set_ylim(0, juviniles_max)
-        ax.set_zlim(0, adults_max)
-        ax.set_title(model.description())
-
-        ax.set_xlabel("Fry")
-        ax.set_ylabel("Juveniles")
-        ax.set_zlabel("Adults")
-        fig.canvas.draw()
-
-    update(None)
-
-    for slider in list(parameter_sliders.values()) + [
-        fry_slider,
-        juvinililes_slider,
-        adults_slider,
-    ]:
-        slider.on_changed(update)
-
-    # Create a function resetSlider to set slider to
-    # initial values when Reset button is clicked
-
-    def resetSlider(event):
-        for slider in list(parameter_sliders.values()) + [
-            fry_slider,
-            juvinililes_slider,
-            adults_slider,
-        ]:
-            slider.reset()
-
-    # Call resetSlider function when clicked on reset button
-    button.on_clicked(resetSlider)
-    plt.show()
+def seasonal_env_updater(period_steps: int = 52,
+                         temp_C_base: float = 24.0,
+                         temp_amp: float = 4.0,
+                         o2_base: float = 6.0,
+                         o2_amp: float = 1.0,
+                         pred_base: float = 0.2,
+                         pred_amp: float = 0.15,
+                         refuge_base: float = 0.5,
+                         refuge_amp: float = 0.2) -> EnvUpdater:
+    """
+    Build a simple sinusoidal seasonal updater for key env variables.
+    Safe bounds applied inside Environment methods later.
+    """
+    def _update(t: int, env: Environment) -> None:
+        phase = 2.0 * math.pi * (t % period_steps) / max(1, period_steps)
+        env.temperature_C = temp_C_base + temp_amp * math.sin(phase)
+        env.dissolved_oxygen_mgL = max(0.1, o2_base + o2_amp * math.cos(phase))
+        env.predator_pressure = min(1.0, max(0.0, pred_base + pred_amp * math.sin(phase + math.pi / 4)))
+        env.refuge_index = min(1.0, max(0.0, refuge_base + refuge_amp * math.cos(phase + math.pi / 6)))
+    return _update
 
 
-def sensitivity_run(
-    models: List[SimpleModel], initial=SimpleModel.State(20, 20), iterations=40
-):
-    list_adults = []
-    for model in models:
-        model.iterations = iterations
-        _, adults = model.run(initial)
-        plt.plot(
-            range(iterations),
-            list(adults),
-            label=model.description(),
-        )
-        list_adults.append(adults)
+def demo_run(iterations: int = 60,
+             init: Tuple[float, float, float, float] = (10.0, 2.0, 1.0, 1.0),
+             with_tank: bool = False,
+             with_feeding: bool = False,
+             with_seasonal_env: bool = False):
+    """
+    Demo helper used by notebooks/tests. Returns (F,J,AF,AM).
+    """
+    m = FryModel(iterations=iterations)
+    m.env = Environment(temperature_C=26.0, dissolved_oxygen_mgL=5.5,
+                        salinity_ppt=0.5, ammonia_mgL=0.0,
+                        pH=7.5, conductivity_uScm=300.0,
+                        refuge_index=0.4, predator_pressure=0.15)
 
-    plt.xlabel("Time step")
-    plt.ylabel("Adult Population")
-    plt.legend()
-    plt.show()
+    # Optional tank shape & feeding schedule (safe if module missing)
+    if with_tank and TankShape is not None:
+        m.tank_shape = TankShape(length_m=0.6, width_m=0.3, depth_m=0.25)
+    if with_feeding and FeedingSchedule is not None:
+        m.feeding_schedule = FeedingSchedule(regime="pulsed", food_index=0.6,
+                                             pulse_period_steps=7, pulse_duty_cycle=0.5,
+                                             pulse_low=0.3, pulse_high=0.9)
+
+    # pick runner
+    if with_seasonal_env:
+        env_fn = seasonal_env_updater(period_steps=52)
+        return simulate_with_env_profile(m, init=init, steps=iterations, env_updater=env_fn)
+    else:
+        return m.run(SimpleModel.State(*init))
 
 
-def ordinary3d_plot_over_time(model: FryModel):
-    fry, juveniles, adults = model.run(FryModel.State(1, 1, 1))
-
-    plt.plot(range(model.iterations), list(fry), label="Fry")
-    plt.plot(range(model.iterations), list(juveniles), label="Juveniles")
-    plt.plot(range(model.iterations), list(adults), label="Adults")
-    plt.xlabel("Time step")
-    plt.ylabel("Population")
-    plt.legend()
-    plt.title(model.description())
+def plot_with_seasonal_env(iterations: int = 120):
+    """Quick visual check for temporal env effects."""
+    F, J, AF, AM = demo_run(iterations=iterations,
+                            init=(10, 2, 1, 1),
+                            with_tank=False,
+                            with_feeding=True,
+                            with_seasonal_env=True)
+    t = np.arange(len(F))
+    fig, ax = _ensure_axes()
+    ax.plot(t, F, label="Fry")
+    ax.plot(t, J, label="Juveniles")
+    ax.plot(t, AF, label="Adult ♀")
+    ax.plot(t, AM, label="Adult ♂")
+    ax.set_xlabel("Step")
+    ax.set_ylabel("Abundance")
+    ax.set_title("Temporal environment demo (seasonal)")
+    ax.legend()
+    fig.tight_layout()
     plt.show()
